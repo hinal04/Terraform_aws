@@ -1,54 +1,83 @@
-# Defining variables for the module
-variable "ami_id" {
-  description = "The AMI ID for the EC2 instance"
+variable "num_instance" {
+  description = "Number of EC2 instances to create"
+  type        = number
+  default     = 1
+}
+
+variable "ami" {
+  description = "AMI ID to use for the EC2 instance"
   type        = string
 }
 
 variable "instance_type" {
-  description = "The type of EC2 instance (e.g., t2.micro)"
+  description = "EC2 instance type"
   type        = string
-  default     = "t2.micro"
-}
-
-variable "instance_name" {
-  description = "The name tag for the EC2 instance"
-  type        = string
+  default     = "t3.micro"
 }
 
 variable "key_name" {
-  description = "The name of the key pair to use for the instance"
+  description = "Key pair name to attach to the instance"
   type        = string
+  default     = null
 }
 
-variable "security_group_ids" {
+variable "monitoring" {
+  description = "Enable detailed monitoring"
+  type        = bool
+  default     = false
+}
+
+variable "vpc_security_group_ids" {
   description = "List of security group IDs to associate with the instance"
   type        = list(string)
 }
 
 variable "subnet_id" {
-  description = "The subnet ID to launch the instance in"
+  description = "Subnet ID to launch the instance in"
   type        = string
 }
 
-variable "associate_public_ip" {
+variable "iam_instance_profile" {
+  description = "IAM instance profile to attach to the instance"
+  type        = string
+  default     = null
+}
+
+variable "associate_public_ip_address" {
   description = "Whether to associate a public IP address with the instance"
   type        = bool
-  default     = true
+  default     = false
 }
 
-variable "user_data" {
-  description = "User data script to initialize the instance"
+variable "ebs_optimized" {
+  description = "If true, the launched EC2 instance will be EBS-optimized"
+  type        = bool
+  default     = false
+}
+
+variable "root_block_device" {
+  description = "Configuration for the root block device"
+  type = list(object({
+    delete_on_termination = optional(bool, true)
+    encrypted             = optional(bool, false)
+    iops                  = optional(number)
+    kms_key_id            = optional(string)
+    volume_size           = optional(number)
+    volume_type           = optional(string, "gp3")
+    throughput            = optional(number)
+    tags                  = optional(map(string), {})
+  }))
+  default = []
+}
+
+variable "instance_name" {
+  description = "Base name for the EC2 instances (will append -1, -2, etc.)"
   type        = string
-  default     = ""
+  default     = "ec2-instance"
 }
 
-variable "additional_tags" {
-  description = "Additional tags for the EC2 instance"
+variable "tags" {
+  description = "Additional tags to apply to the instances"
   type        = map(string)
   default     = {}
-}
-
-variable "availability_zone" {
-  description = "The availability zone to launch the instance in"
-  type        = string
 }
